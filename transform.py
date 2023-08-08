@@ -1,23 +1,24 @@
 
-from pygments.lexers import get_lexer_for_filename
-from pygments.token import Token
-from autocorrect import Speller
-import spacy
-from scispacy.abbreviation import AbbreviationDetector
+#from pygments.lexers import get_lexer_for_filename
+#from pygments.token import Token
+#from autocorrect import Speller
+#import spacy
+#from scispacy.abbreviation import AbbreviationDetector
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-import fasttext
+#from sklearn.feature_extraction.text import TfidfVectorizer
+#from sklearn.metrics.pairwise import cosine_similarity
+#import fasttext
+import string
 
 # TODO: refactor :)
-nlp = spacy.load("en_core_web_sm")
-nlp.add_pipe("abbreviation_detector")
-nltk.download('punkt')
-nltk.download('wordnet')
-nltk.download('stopwords')
+#nlp = spacy.load("en_core_web_sm")
+#nlp.add_pipe("abbreviation_detector")
+#nltk.download('punkt')
+#nltk.download('wordnet')
+#nltk.download('stopwords')
 
 def replace_acronyms(text):
     doc = nlp(text)
@@ -73,8 +74,8 @@ def transform_code_into_text(filename):
         elif token[0] == Token.Name:
             s = s + ' ' + split_function_name(token[1]);     #Variable name
             
-    # print('---------------------------------------')            
-    # print(s)
+    print('---------------------------------------')            
+    print(s)
 
     # Remove code vocabulary (keywords and punct.)
     # What we want to keep:
@@ -99,15 +100,15 @@ def transform_code_into_text(filename):
     # #Expand acronyms
     s = replace_acronyms(s)
 
-    # print('---------------------------------------')            
-    # print(s)
+    print('---------------------------------------')            
+    print(s)
 
     # #Auto correct
     spell = Speller()
     s = spell(s)
 
-    # print('---------------------------------------')            
-    # print(s)
+    print('---------------------------------------')            
+    print(s)
     return s
 
 def text_similarity_nltk(text1, text2):
@@ -142,9 +143,37 @@ def text_similarity_scikit(text1, text2):
     similarity = cosine_similarity(vectors)
     return similarity
 
+def transform_code_into_text_nltk(filename):
+    # Get source code content
+    f = open(filename)
+#    lines = ''.join(f.readlines())
+    lines = f.read()
+    f.close()
+    lines_filtered = lines.translate(str.maketrans('', '', string.punctuation))
+    tokens = word_tokenize(lines_filtered)
+    stop_words = set(stopwords.words('english'))
+    textfile = filename + ".txt"
+    f = open(textfile,'w')
+    i = 0
+    written_tokens = []
+    for token in tokens:
+        if token not in stop_words:
+            if token not in written_tokens:
+                written_tokens.append(token)
+                if i == 0:
+                    f.write(token)
+                else:
+                    f.write(" " + token)
+                i += 1
+    f.close()
+
 print("Transform source code")
-s1 = transform_code_into_text('./samples/docparse.py')
-s2 = transform_code_into_text('./samples/gtest-printers.cc')
+#s1 = transform_code_into_text('./samples/docparse.py')
+#s2 = transform_code_into_text('./samples/gtest-printers.cc')
+transform_code_into_text_nltk('./samples/docparse.py')
+transform_code_into_text_nltk('./samples/gtest-printers.cc')
+
+exit()
 
 text = "Make it possible to customize the dict that cuntains the list of words that suggest we have a spam."
 text = replace_acronyms(text)
