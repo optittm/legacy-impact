@@ -2,7 +2,7 @@
 #from pygments.lexers import get_lexer_for_filename
 #from pygments.token import Token
 #from autocorrect import Speller
-#import spacy
+import spacy
 #from scispacy.abbreviation import AbbreviationDetector
 import nltk
 from nltk.corpus import stopwords
@@ -14,7 +14,7 @@ from nltk.stem import WordNetLemmatizer
 import string
 
 # TODO: refactor :)
-#nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("en_core_web_sm")
 #nlp.add_pipe("abbreviation_detector")
 #nltk.download('punkt')
 #nltk.download('wordnet')
@@ -151,20 +151,22 @@ def transform_code_into_text_nltk(filename):
     f.close()
     lines_filtered = lines.translate(str.maketrans('', '', string.punctuation))
     tokens = word_tokenize(lines_filtered)
+    tokens2 = []
+    for token in tokens:
+        token2 = split_function_name(token).split()
+        for t in token2:
+            tokens2.append(t)
     stop_words = set(stopwords.words('english'))
+    lemmatizer = WordNetLemmatizer()
+    tokens2 = [lemmatizer.lemmatize(token) for token in tokens2]
+    output_tokens = []
+    for token in tokens2:
+        if token not in stop_words:
+            if token not in output_tokens:
+                output_tokens.append(token)
     textfile = filename + ".txt"
     f = open(textfile,'w')
-    i = 0
-    written_tokens = []
-    for token in tokens:
-        if token not in stop_words:
-            if token not in written_tokens:
-                written_tokens.append(token)
-                if i == 0:
-                    f.write(token)
-                else:
-                    f.write(" " + token)
-                i += 1
+    f.write(" ".join(output_tokens))
     f.close()
 
 print("Transform source code")
