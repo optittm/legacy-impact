@@ -1,21 +1,20 @@
-
-#from pygments.lexers import get_lexer_for_filename
-#from pygments.token import Token
-#from autocorrect import Speller
+from pygments.lexers import get_lexer_for_filename
+from pygments.token import Token
+from autocorrect import Speller
 import spacy
-#from scispacy.abbreviation import AbbreviationDetector
+from scispacy.abbreviation import AbbreviationDetector
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
-#from sklearn.feature_extraction.text import TfidfVectorizer
-#from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 #import fasttext
 import string
 
 # TODO: refactor :)
 nlp = spacy.load("en_core_web_sm")
-#nlp.add_pipe("abbreviation_detector")
+nlp.add_pipe("abbreviation_detector")
 #nltk.download('punkt')
 #nltk.download('wordnet')
 #nltk.download('stopwords')
@@ -74,8 +73,8 @@ def transform_code_into_text(filename):
         elif token[0] == Token.Name:
             s = s + ' ' + split_function_name(token[1]);     #Variable name
             
-    print('---------------------------------------')            
-    print(s)
+    #print('---------------------------------------')            
+    #print(s)
 
     # Remove code vocabulary (keywords and punct.)
     # What we want to keep:
@@ -100,15 +99,15 @@ def transform_code_into_text(filename):
     # #Expand acronyms
     s = replace_acronyms(s)
 
-    print('---------------------------------------')            
-    print(s)
+    #print('---------------------------------------')            
+    #print(s)
 
     # #Auto correct
     spell = Speller()
     s = spell(s)
 
-    print('---------------------------------------')            
-    print(s)
+    #print('---------------------------------------')            
+    #print(s)
     return s
 
 def text_similarity_nltk(text1, text2):
@@ -144,9 +143,7 @@ def text_similarity_scikit(text1, text2):
     return similarity
 
 def transform_code_into_text_nltk(filename):
-    # Get source code content
     f = open(filename)
-#    lines = ''.join(f.readlines())
     lines = f.read()
     f.close()
     lines_filtered = lines.translate(str.maketrans('', '', string.punctuation))
@@ -157,38 +154,43 @@ def transform_code_into_text_nltk(filename):
         for t in token2:
             tokens2.append(t)
     stop_words = set(stopwords.words('english'))
-    lemmatizer = WordNetLemmatizer()
-    tokens2 = [lemmatizer.lemmatize(token) for token in tokens2]
-    output_tokens = []
+    tokens3 = []
     for token in tokens2:
         if token not in stop_words:
-            if token not in output_tokens:
-                output_tokens.append(token)
+            if token not in tokens3:
+                tokens3.append(token)
+    lemmatizer = WordNetLemmatizer()
+    tokens3 = [lemmatizer.lemmatize(token) for token in tokens3]
     textfile = filename + ".txt"
     f = open(textfile,'w')
-    f.write(" ".join(output_tokens))
+    f.write(" ".join(tokens3))
     f.close()
+    return " ".join(tokens3)
 
 print("Transform source code")
-#s1 = transform_code_into_text('./samples/docparse.py')
-#s2 = transform_code_into_text('./samples/gtest-printers.cc')
-transform_code_into_text_nltk('./samples/docparse.py')
-transform_code_into_text_nltk('./samples/gtest-printers.cc')
-
-exit()
+s1 = transform_code_into_text_nltk('./samples/docparse.py')
+s2 = transform_code_into_text_nltk('./samples/gtest-printers.cc')
+#s3 = transform_code_into_text('./samples/docparse.py')
+#s4 = transform_code_into_text('./samples/gtest-printers.cc')
+print("Code transformed")
 
 text = "Make it possible to customize the dict that cuntains the list of words that suggest we have a spam."
-text = replace_acronyms(text)
+#text = replace_acronyms(text)
 spell = Speller()
 text = spell(text)
-print(text)
+#print(text)
 
+print("Compute distance between code and text")
 # dist_s1_text = text_similarity(s1, text)
 # dist_s2_text = text_similarity(s2, text)
 dist_s1_text = text_similarity_scikit(s1, text)
 dist_s2_text = text_similarity_scikit(s2, text)
-print('distance = ', dist_s1_text[0][1], " / ", dist_s2_text[0][1])
-
+print('distance with file 1 (cosine) = ', dist_s1_text[0][1])
+print('distance with file 2 (cosine) = ', dist_s2_text[0][1])
+dist_s1_text = nltk.edit_distance(s1, text)
+dist_s2_text = nltk.edit_distance(s2, text)
+print('distance with file 1 (NLTK) = ', dist_s1_text)
+print('distance with file 2 (NLTK) = ', dist_s2_text)
 
 # autocorrect-2.6.1
 # scispacy-0.5.2
