@@ -11,6 +11,11 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 #import fasttext
 import string
+import time
+#from pathlib import Path
+import glob
+
+time1 = time.time()
 
 # TODO: refactor :)
 nlp = spacy.load("en_core_web_sm")
@@ -167,30 +172,68 @@ def transform_code_into_text_nltk(filename):
     f.close()
     return " ".join(tokens3)
 
-print("Transform source code")
-s1 = transform_code_into_text_nltk('./samples/docparse.py')
-s2 = transform_code_into_text_nltk('./samples/gtest-printers.cc')
-#s3 = transform_code_into_text('./samples/docparse.py')
-#s4 = transform_code_into_text('./samples/gtest-printers.cc')
-print("Code transformed")
+print("Program pre-load time: %s" % (time.time() - time1))
 
-text = "Make it possible to customize the dict that cuntains the list of words that suggest we have a spam."
-#text = replace_acronyms(text)
-spell = Speller()
-text = spell(text)
-#print(text)
+repo1 = './samples/MetaGPT'
+repo2 = './samples/supervision'
+repo3 = './samples/PaddleNLP'
 
-print("Compute distance between code and text")
-# dist_s1_text = text_similarity(s1, text)
-# dist_s2_text = text_similarity(s2, text)
-dist_s1_text = text_similarity_scikit(s1, text)
-dist_s2_text = text_similarity_scikit(s2, text)
-print('distance with file 1 (cosine) = ', dist_s1_text[0][1])
-print('distance with file 2 (cosine) = ', dist_s2_text[0][1])
-dist_s1_text = nltk.edit_distance(s1, text)
-dist_s2_text = nltk.edit_distance(s2, text)
-print('distance with file 1 (NLTK) = ', dist_s1_text)
-print('distance with file 2 (NLTK) = ', dist_s2_text)
+filelist = []
+for f in glob.glob(repo3 + '/**/*.py', recursive = True):
+    filelist.append(f)
+
+#for path in Path(repo1).rglob('*.py'):
+#    print(path.name)
+
+for f in filelist:
+    print("--------------------------------")
+    print("Processing file " + f)
+    time2 = time.time()
+    s = transform_code_into_text_nltk(f)
+    print("Elapsed time for transformation: %s" % (time.time() - time2))
+    text = "Make it possible to customize the dict that cuntains the list of words that suggest we have a spam."
+    spell = Speller()
+    text = spell(text)
+    time3 = time.time()
+    dist_s_text = text_similarity_scikit(s, text)
+    print('distance with file (cosine) = ', dist_s_text[0][1])
+    print("Computation time for cosine similarity: %s" % (time.time() - time3))
+    time4 = time.time()
+    dist_s_text = nltk.edit_distance(s, text)
+    print('distance with file (NLTK) = ', dist_s_text)
+    print("Computation time for NLTK text distance: %s" % (time.time() - time4))
+
+# time2 = time.time()
+# print("Transform source code")
+# s1 = transform_code_into_text_nltk('./samples/docparse.py')
+# s2 = transform_code_into_text_nltk('./samples/gtest-printers.cc')
+# #s3 = transform_code_into_text('./samples/docparse.py')
+# #s4 = transform_code_into_text('./samples/gtest-printers.cc')
+# print("Code transformed")
+# print("Elapsed time for transformation: %s" % (time.time() - time2))
+
+# text = "Make it possible to customize the dict that cuntains the list of words that suggest we have a spam."
+# #text = replace_acronyms(text)
+# spell = Speller()
+# text = spell(text)
+# #print(text)
+
+# print("Compute distance between code and text")
+# # dist_s1_text = text_similarity(s1, text)
+# # dist_s2_text = text_similarity(s2, text)
+# time3 = time.time()
+# dist_s1_text = text_similarity_scikit(s1, text)
+# dist_s2_text = text_similarity_scikit(s2, text)
+# print('distance with file 1 (cosine) = ', dist_s1_text[0][1])
+# print('distance with file 2 (cosine) = ', dist_s2_text[0][1])
+# print("Computation time for cosine similarity: %s" % (time.time() - time3))
+
+# time4 = time.time()
+# dist_s1_text = nltk.edit_distance(s1, text)
+# dist_s2_text = nltk.edit_distance(s2, text)
+# print('distance with file 1 (NLTK) = ', dist_s1_text)
+# print('distance with file 2 (NLTK) = ', dist_s2_text)
+# print("Computation time for NLTK text distance: %s" % (time.time() - time4))
 
 # autocorrect-2.6.1
 # scispacy-0.5.2
