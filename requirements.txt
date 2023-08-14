@@ -1,0 +1,6 @@
+pygments
+autocorrect
+spacy
+scispacy
+nltk
+scikit-learn
