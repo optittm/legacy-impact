@@ -1,0 +1,21 @@
+version: '3'
+services:
+
+  tf-unsupervised:
+    container_name: tf-unsupervised
+    build: 
+      context: ./Docker/tensorflow
+      dockerfile: .Dockerfile
+    ports:
+      - 8888:8888
+    volumes:
+      - .:/data
+  py-unsupervised:
+    container_name: py-unsupervised
+    build: 
+      context: ./Docker/pytorch
+      dockerfile: .Dockerfile
+    ports:
+      - 8080:8888
+    volumes:
+      - .:/data

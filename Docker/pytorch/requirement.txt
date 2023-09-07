@@ -1,0 +1,7 @@
+jupyterlab
+Pillow
+torchtext
+ipywidgets
+transformers
+nltk
+sentence-transformers
