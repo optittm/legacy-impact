@@ -27,3 +27,9 @@ https://github.com/SivaM07/quarkus/blob/61a56c79dc3dbf9beb7075076af40f4ea98c5d9c
 
 File not related with the issue:
 https://github.com/quarkusio/quarkus/blob/main/core/runtime/src/main/java/io/quarkus/runtime/graal/AwtImageIO.java
+
+## RUN codeT5
+
+1- In the root of your project folder enter `docker-compose up -d --build`, if the container is already install enter `docker-compose up -d`
+2- Go to the [notebook](localhost:8080/?token=pytorch), if this link don't work the token is `pytorch`
+3- Go to the file `find_file.ipynb` and run it
