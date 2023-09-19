@@ -31,5 +31,5 @@ https://github.com/quarkusio/quarkus/blob/main/core/runtime/src/main/java/io/qua
 ## RUN codeT5
 
 1. In the root of your project folder enter `docker-compose up -d --build`, if the container is already install enter `docker-compose up -d`
-2. Go to the [notebook](localhost:8080/?token=pytorch), if this link don't work the token is `pytorch`
+2. Go to the [notebook](http://localhost:8080/?token=pytorch), if this link don't work the token is `pytorch`
 3. Go to the file `find_file.ipynb` and run it
