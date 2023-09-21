@@ -7,6 +7,34 @@ Objective of the demonstrator (first iterate):
  4. Compute the distance form the text of the issue with all files of (1). This implie to transform all source file with the algo in transform.py (note: we might use a local DB in order not to do this operation and/or cache the result - with a cache invalidation on modified date).
 
 
+## Usage 
+
+You may need to install these packages:
+
+    sudo apt install libgdbm-dev
+    sudo apt-get install python3.11-gdbm
+
+Start the analysis of a project:
+
+    $ python3 main.py analyze --database go --folder="/home/bbalet/temp/go/src"
+
+Display the 10 first entries of the local DB:
+
+    $ python3 main.py head --database go.db
+
+    -----------------------------------------------------------------------------
+    /home/bbalet/temp/go/src/encoding/xml/xml.go:392 - 403   (d*Decoder)push kind int
+    free returns a stack or creates a new one if none exists.
+    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    s := d.free if s != nil { d.free = s.next } else { s = new(stack) } s.next = d.stk s.kind = kind d.stk = s return s }
+    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Query the code base
+
+    $ python3 main.py lookup --text="unmarshal a value" --database go
+    /home/bbalet/temp/go/src/encoding/xml/read.go:147   (d*Decoder)DecodeElement v any , start * StartElement
+    Unmarshal unmarshals the value pointed to by v.
+
 Proof: 
  4 - Take a PR with modified files in the bug fixing (e.g.)
 

@@ -1,0 +1,8 @@
+lizard
+tqdm
+simhash
+torchtext
+ipywidgets
+transformers
+nltk
+sentence-transformers
