@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "c:\Users\pierre.verdeaux\Documents\R&D-BDX\legacy-impact\repos\case1\src\main.py", line 6, in <module>
+    divide(3, 0)
+  File "c:\Users\pierre.verdeaux\Documents\R&D-BDX\legacy-impact\repos\case1\src\compute.py", line 11, in divide
+    return a / b
+ZeroDivisionError: division by zero

@@ -1,0 +1,26 @@
+Zero Division Error in create_calculator_app
+
+File "<string>", line 1, in <module> ZeroDivisionError: division by zero
+C:\Users\dell>python -u "c:\Users\dell\Desktop\calci0.py"
+Exception in Tkinter callback
+Traceback (most recent call last):
+File "C:\Program Files (x86)\Python38-32\lib\tkinter\ _init__.py", line 1883, in __call_ return self.func(*args)
+File "c:\Users\dell\Desktop\calci0.py", line 106, in <lambda>
+command=lambda: calc(entry), activebackground-button_active_bg)
+File "c:\Users\dell\Desktop\calci0.py", line 22, in calc
+output = str(eval(input_info.strip()))
+File "<string>", line 1, in <module>
+ZeroDivisionError: division by zero
+
+Steps to reproduce the bug :
+
+    Enter any number as the first operand
+
+    Press the division button
+
+    Enter zero as the second operand.
+
+This can be fixed by a **try and catch ** block .
+
+    I would also like to add a button to calculate the powers of numbers .
+    For doing this I plan to change the UI a little i.e. just restrict the '0' button to a single column so that 'power' button can be accommodated in the next column

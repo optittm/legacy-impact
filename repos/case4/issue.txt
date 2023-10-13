@@ -1,0 +1,17 @@
+[BUG] <Issue in Armstrong Number>
+
+Description
+
+According to the definition: It is a number that is equal to the sum of its own digits, each raised to the power of the number of digits.
+But with the given implementation in the repo the digit is not raised to the power of number of Digits but instead raised only to 3.
+
+It can be explained with the help of the Example:
+
+1634 is an Armstrong Number as => 1^4 + 6^4 + 3^4 + 4^4 = 1634
+but according to the implementation we have it will evaluated as 1^3 + 6^3 + 3^3 + 4^3 = 308 != 1634 and will not be an Armstrong Number. The code works fine for the 3 digit numbers but isn't valid for numbers above that threshold
+Generalization
+
+In other words, if you take an n-digit number and raise each of its digits to the nth power, and then sum these values, if the result is equal to the original number, it is considered an Armstrong number.
+Excepted behavior
+
+So we need to change the logic of the code to make the 3 in the Power function variable to the given input.
