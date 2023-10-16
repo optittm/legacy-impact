@@ -29,11 +29,15 @@ Display the 10 first entries of the local DB:
     s := d.free if s != nil { d.free = s.next } else { s = new(stack) } s.next = d.stk s.kind = kind d.stk = s return s }
     ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Query the code base
+Query the code base with a string containing the issue
 
     $ python3 main.py lookup --text="unmarshal a value" --database go
     /home/bbalet/temp/go/src/encoding/xml/read.go:147   (d*Decoder)DecodeElement v any , start * StartElement
     Unmarshal unmarshals the value pointed to by v.
+
+Or with a file containing that issue
+
+    $ python3 main.py lookup --textfile=./issue.txt --database go
 
 Proof: 
  4 - Take a PR with modified files in the bug fixing (e.g.)
@@ -55,3 +59,9 @@ https://github.com/SivaM07/quarkus/blob/61a56c79dc3dbf9beb7075076af40f4ea98c5d9c
 
 File not related with the issue:
 https://github.com/quarkusio/quarkus/blob/main/core/runtime/src/main/java/io/quarkus/runtime/graal/AwtImageIO.java
+
+# Researches :
+
+Some reserches have been made on legacy impact. Any code used for this research is available in the `researches` file :
+ - **Relevance of using codet5 library to correlate code with natural language**: [test-codet5-relevance](./researches/test-codet5-relevance/README.md)
+
