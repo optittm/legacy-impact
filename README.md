@@ -61,3 +61,8 @@ https://github.com/SivaM07/quarkus/blob/61a56c79dc3dbf9beb7075076af40f4ea98c5d9c
 
 File not related with the issue:
 https://github.com/quarkusio/quarkus/blob/main/core/runtime/src/main/java/io/quarkus/runtime/graal/AwtImageIO.java
+
+# Researches :
+
+Some reserches have been made on legacy impact. Any code used for this research is available in the `researches` file :
+ - **Time profiling of transfor function**: [01_transform_time_profiling](./researches/01_transform_time_profiling/README.md)
