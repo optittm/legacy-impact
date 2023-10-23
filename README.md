@@ -1,3 +1,37 @@
+# Installation
+
+Create your environment :
+
+```sh
+python -m venv <env_name>
+```
+
+Activate your environment :
+
+```sh
+source <env_name>/bin/activate
+```
+
+Install requirements :
+
+```sh
+python -m pip install -r requirements.txt
+```
+
+Download the tool for spacy :
+
+```sh
+python -m spacy download en_core_web_sm
+```
+
+Run this project :
+
+```sh
+python transform.py
+```
+
+# Research
+
 The purpose of this research is to guess if a change request or an issue fix will impact legacy files (not changed for a while).
 
 Objective of the demonstrator (first iterate):

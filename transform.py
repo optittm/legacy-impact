@@ -1,4 +1,3 @@
-
 from pygments.lexers import get_lexer_for_filename
 from pygments.token import Token
 from autocorrect import Speller
@@ -10,14 +9,20 @@ from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import fasttext
+#import fasttext
+import string
+import time
+#from pathlib import Path
+import glob
+
+time1 = time.time()
 
 # TODO: refactor :)
 nlp = spacy.load("en_core_web_sm")
 nlp.add_pipe("abbreviation_detector")
-nltk.download('punkt')
-nltk.download('wordnet')
-nltk.download('stopwords')
+#nltk.download('punkt')
+#nltk.download('wordnet')
+#nltk.download('stopwords')
 
 def replace_acronyms(text):
     doc = nlp(text)
@@ -73,8 +78,8 @@ def transform_code_into_text(filename):
         elif token[0] == Token.Name:
             s = s + ' ' + split_function_name(token[1]);     #Variable name
             
-    # print('---------------------------------------')            
-    # print(s)
+    #print('---------------------------------------')            
+    #print(s)
 
     # Remove code vocabulary (keywords and punct.)
     # What we want to keep:
@@ -99,15 +104,15 @@ def transform_code_into_text(filename):
     # #Expand acronyms
     s = replace_acronyms(s)
 
-    # print('---------------------------------------')            
-    # print(s)
+    #print('---------------------------------------')            
+    #print(s)
 
     # #Auto correct
     spell = Speller()
     s = spell(s)
 
-    # print('---------------------------------------')            
-    # print(s)
+    #print('---------------------------------------')            
+    #print(s)
     return s
 
 def text_similarity_nltk(text1, text2):
@@ -142,22 +147,93 @@ def text_similarity_scikit(text1, text2):
     similarity = cosine_similarity(vectors)
     return similarity
 
-print("Transform source code")
-s1 = transform_code_into_text('./samples/docparse.py')
-s2 = transform_code_into_text('./samples/gtest-printers.cc')
+def transform_code_into_text_nltk(filename):
+    f = open(filename)
+    lines = f.read()
+    f.close()
+    lines_filtered = lines.translate(str.maketrans('', '', string.punctuation))
+    tokens = word_tokenize(lines_filtered)
+    tokens2 = []
+    for token in tokens:
+        token2 = split_function_name(token).split()
+        for t in token2:
+            tokens2.append(t)
+    stop_words = set(stopwords.words('english'))
+    tokens3 = []
+    for token in tokens2:
+        if token not in stop_words:
+            if token not in tokens3:
+                tokens3.append(token)
+    lemmatizer = WordNetLemmatizer()
+    tokens3 = [lemmatizer.lemmatize(token) for token in tokens3]
+    textfile = filename + ".txt"
+    f = open(textfile,'w')
+    f.write(" ".join(tokens3))
+    f.close()
+    return " ".join(tokens3)
 
-text = "Make it possible to customize the dict that cuntains the list of words that suggest we have a spam."
-text = replace_acronyms(text)
-spell = Speller()
-text = spell(text)
-print(text)
+print("Program pre-load time: %s" % (time.time() - time1))
 
-# dist_s1_text = text_similarity(s1, text)
-# dist_s2_text = text_similarity(s2, text)
-dist_s1_text = text_similarity_scikit(s1, text)
-dist_s2_text = text_similarity_scikit(s2, text)
-print('distance = ', dist_s1_text[0][1], " / ", dist_s2_text[0][1])
+repo1 = './samples/MetaGPT'
+repo2 = './samples/supervision'
+repo3 = './samples/PaddleNLP'
 
+filelist = []
+for f in glob.glob(repo3 + '/**/*.py', recursive = True):
+    filelist.append(f)
+
+#for path in Path(repo1).rglob('*.py'):
+#    print(path.name)
+
+for f in filelist:
+    print("--------------------------------")
+    print("Processing file " + f)
+    time2 = time.time()
+    s = transform_code_into_text_nltk(f)
+    print("Elapsed time for transformation: %s" % (time.time() - time2))
+    text = "Make it possible to customize the dict that cuntains the list of words that suggest we have a spam."
+    spell = Speller()
+    text = spell(text)
+    time3 = time.time()
+    dist_s_text = text_similarity_scikit(s, text)
+    print('distance with file (cosine) = ', dist_s_text[0][1])
+    print("Computation time for cosine similarity: %s" % (time.time() - time3))
+    time4 = time.time()
+    dist_s_text = nltk.edit_distance(s, text)
+    print('distance with file (NLTK) = ', dist_s_text)
+    print("Computation time for NLTK text distance: %s" % (time.time() - time4))
+
+# time2 = time.time()
+# print("Transform source code")
+# s1 = transform_code_into_text_nltk('./samples/docparse.py')
+# s2 = transform_code_into_text_nltk('./samples/gtest-printers.cc')
+# #s3 = transform_code_into_text('./samples/docparse.py')
+# #s4 = transform_code_into_text('./samples/gtest-printers.cc')
+# print("Code transformed")
+# print("Elapsed time for transformation: %s" % (time.time() - time2))
+
+# text = "Make it possible to customize the dict that cuntains the list of words that suggest we have a spam."
+# #text = replace_acronyms(text)
+# spell = Speller()
+# text = spell(text)
+# #print(text)
+
+# print("Compute distance between code and text")
+# # dist_s1_text = text_similarity(s1, text)
+# # dist_s2_text = text_similarity(s2, text)
+# time3 = time.time()
+# dist_s1_text = text_similarity_scikit(s1, text)
+# dist_s2_text = text_similarity_scikit(s2, text)
+# print('distance with file 1 (cosine) = ', dist_s1_text[0][1])
+# print('distance with file 2 (cosine) = ', dist_s2_text[0][1])
+# print("Computation time for cosine similarity: %s" % (time.time() - time3))
+
+# time4 = time.time()
+# dist_s1_text = nltk.edit_distance(s1, text)
+# dist_s2_text = nltk.edit_distance(s2, text)
+# print('distance with file 1 (NLTK) = ', dist_s1_text)
+# print('distance with file 2 (NLTK) = ', dist_s2_text)
+# print("Computation time for NLTK text distance: %s" % (time.time() - time4))
 
 # autocorrect-2.6.1
 # scispacy-0.5.2
